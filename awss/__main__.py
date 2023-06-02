@@ -47,12 +47,13 @@ def ec2(ctx):
 # defaults find ubuntu 18.04 instances
 @option("--owner-id", "-o", help="AMI owner ID, example: '099720109477' (Canonical)")
 @option("--ami-name-filter", "-n", help="AMI name filter, to supply wildcards enclose the argument in single quotes, example: '*18.04*'")
-def ami_instances(ctx, owner_id, name_filter):
+def ami_instances(ctx, owner_id, ami_name_filter):
     find_instances_by_ami_owner(
         ctx.obj["session"],
         ctx.obj["workers"],
         owner_id,
-        name_filter,
+        ami_name_filter,
+        print_lock
     )
 
 
