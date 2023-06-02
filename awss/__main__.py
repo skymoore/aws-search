@@ -2,7 +2,8 @@ import boto3
 from threading import Lock
 from logging import basicConfig, INFO, DEBUG, info
 from click import option, group, pass_context #, Choice
-from .lib import list_rds_instances, find_instances_by_ami_owner
+from .rds import list_rds_instances
+from .ec2 import find_instances_by_ami_owner
 
 print_lock = Lock()
 
