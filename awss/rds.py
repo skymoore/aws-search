@@ -3,6 +3,7 @@ from time import perf_counter
 from logging import info, warning
 from .lib import get_regions
 
+
 def list_rds_instances(session, workers, info_lock):
     def list_rds(session, region):
         try:
@@ -42,6 +43,6 @@ def list_rds_instances(session, workers, info_lock):
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
         executor.map(lambda params: list_rds(*params), inputs)
-    
+
     end = perf_counter()
     info(f"list_rds_instances() execution time: {end - start:.2f}s")

@@ -3,6 +3,7 @@ from time import perf_counter
 from logging import info, error, warning
 from .lib import get_regions
 
+
 def get_ami_ids_by_owner(session, region, owner_id, name_filter, print_lock):
     ec2 = session.client("ec2", region_name=region)
     ami_ids = {}
@@ -34,6 +35,7 @@ def get_ami_ids_by_owner(session, region, owner_id, name_filter, print_lock):
         info(f"{len(ami_ids.keys())} amis owned by {owner_id[0]} in region {region}")
     return ami_ids
 
+
 def find_instances_by_ami_owner(session, workers, owner_id, name_filter, print_lock):
     def find_instances(session, region, owner_id, name_filter, print_lock):
         try:
@@ -47,12 +49,13 @@ def find_instances_by_ami_owner(session, workers, owner_id, name_filter, print_l
                 return
             with print_lock:
                 info(f"{num_instances} ec2 instances in region {region}")
-            ami_ids = get_ami_ids_by_owner(session, region, owner_id, name_filter, print_lock)
+            ami_ids = get_ami_ids_by_owner(
+                session, region, owner_id, name_filter, print_lock
+            )
 
             found_instance = False
             matches = []
             for instance in instances:
-
                 try:
                     if instance.image_id in ami_ids:
                         found_instance = True
@@ -76,16 +79,18 @@ def find_instances_by_ami_owner(session, workers, owner_id, name_filter, print_l
         except Exception as e:
             with print_lock:
                 warning(f"{region}: {e}")
-    
+
     start = perf_counter()
     regions = get_regions(session, "ec2")
     info(
         f"searching {len(regions)} aws regions with {workers} workers for ec2 instances running an ami owned by {owner_id} whose name matches {name_filter}..."
     )
-    inputs = [(session, region, owner_id, name_filter, print_lock) for region in regions]
+    inputs = [
+        (session, region, owner_id, name_filter, print_lock) for region in regions
+    ]
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
         executor.map(lambda params: find_instances(*params), inputs)
-    
+
     end = perf_counter()
     info(f"find_instances_by_ami_owner() execution time: {end - start:.2f}s")
