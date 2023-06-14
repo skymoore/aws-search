@@ -4,6 +4,7 @@ from logging import basicConfig, INFO, DEBUG, info
 from click import option, group, pass_context  # , Choice
 from .rds import list_rds_instances
 from .ec2 import find_instances_by_ami_owner
+from .sts import check_credentials
 
 print_lock = Lock()
 
@@ -66,7 +67,7 @@ def ec2(ctx):
 )
 def ami_instances(ctx, owner_id, ami_name_filter):
     find_instances_by_ami_owner(
-        ctx.obj["session"], ctx.obj["workers"], owner_id, ami_name_filter, print_lock
+        ctx.obj["session"], ctx.obj["workers"], print_lock, owner_id, ami_name_filter
     )
 
 
@@ -77,3 +78,18 @@ def ami_instances(ctx, owner_id, ami_name_filter):
 @pass_context
 def ecr(ctx):
     raise NotImplementedError
+
+
+# STS COMMANDS
+
+
+@cli.group(help="STS commands")
+@pass_context
+def sts(ctx):
+    pass
+
+
+@sts.command("check", help="Check if the current session is valid")
+@pass_context
+def check(ctx):
+    check_credentials(ctx.obj["session"], ctx.obj["workers"], print_lock)
