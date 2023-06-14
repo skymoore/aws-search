@@ -89,7 +89,7 @@ def sts(ctx):
     pass
 
 
-@sts.command("check", help="Check if the current session is valid")
+@sts.command("check", help="Check if the current session is valid in all regions")
 @pass_context
 def check(ctx):
     check_credentials(ctx.obj["session"], ctx.obj["workers"], print_lock)
