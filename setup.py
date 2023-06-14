@@ -29,7 +29,7 @@ setup(
     license="MIT",
     long_description_content_type="text/markdown",
     long_description=readme,
-    name="aws-search",
+    name="aws-multi-region-search",
     packages=find_packages(include=["awss"]),
     entry_points={"console_scripts": ["awss = awss.__main__:cli"]},
     url="https://github.com/skymoore/aws-search",
