@@ -20,10 +20,11 @@ def list_rds(session, region, print_lock):
             ]
         )
 
+        len_db_names = len(db_names)
         with print_lock:
-            if len(db_names) > 0:
+            if len_db_names > 0:
                 info(
-                    f"region: {region}\n\tfound {len(db_names)} databases:\n\t\t"
+                    f"region: {region}\n\tfound {len_db_names} {'database' if len_db_names == 1 else 'databases'}:\n\t\t"
                     + "\n\t\t".join(db_names)
                 )
             else:

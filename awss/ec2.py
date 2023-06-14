@@ -12,10 +12,10 @@ def get_ami_ids_by_owner(session, region, owner_id, name_filter, print_lock):
             "Values": [name_filter],
         }
     ]
-    owner_id = [owner_id]
+    owner_id = owner_id
 
     response = ec2.describe_images(
-        Owners=owner_id,
+        Owners=[owner_id],
         Filters=filter,
     )
     for ami in response["Images"]:
@@ -23,67 +23,61 @@ def get_ami_ids_by_owner(session, region, owner_id, name_filter, print_lock):
 
     while "NextToken" in response:
         response = ec2.describe_images(
-            Owners=owner_id,
+            Owners=[owner_id],
             Filters=filter,
             NextToken=response["NextToken"],
         )
         for ami in response["Images"]:
             ami_ids[ami["ImageId"]] = ""
 
+    len_ami_ids = len(ami_ids.keys())
+
     with print_lock:
-        info(f"{len(ami_ids.keys())} amis owned by {owner_id[0]} in region {region}")
+        info(
+            f"{len_ami_ids} {'ami' if len_ami_ids == 1 else 'amis'} owned by {owner_id} in region {region}"
+        )
     return ami_ids
+
+
+@multithreaded
+def check_instance_for_match(
+    instance, region, instance_ids_by_region, ami_ids, print_lock
+):
+    if instance.image_id in ami_ids:
+        if region not in instance_ids_by_region:
+            instance_ids_by_region[region] = [instance.id]
+        else:
+            instance_ids_by_region[region].append(instance.id)
 
 
 @multithreaded
 def find_instances(
     session, region, print_lock, owner_id, name_filter, instance_ids_by_region
 ):
-    try:
-        ec2_resource = session.resource("ec2", region_name=region)
-        instances = ec2_resource.instances.all()
-        num_instances = len(list(instances))
+    ec2_resource = session.resource("ec2", region_name=region)
+    instances = ec2_resource.instances.all()
+    num_instances = len(list(instances))
 
-        if num_instances == 0:
-            with print_lock:
-                info(f"no ec2 instances found in region {region}")
-            return
+    if num_instances == 0:
         with print_lock:
-            info(f"{num_instances} ec2 instances in region {region}")
-        ami_ids = get_ami_ids_by_owner(
-            session, region, owner_id, name_filter, print_lock
+            info(f"no ec2 instances found in region {region}")
+        return
+    with print_lock:
+        info(f"{num_instances} ec2 instances in region {region}")
+
+    ami_ids = get_ami_ids_by_owner(session, region, owner_id, name_filter, print_lock)
+
+    inputs = [
+        (instance, region, instance_ids_by_region, ami_ids, print_lock)
+        for instance in instances
+    ]
+
+    check_instance_for_match(inputs, 4)
+    len_instance_ids = len(instance_ids_by_region[region])
+    with print_lock:
+        info(
+            f"{len_instance_ids} matching {'instance' if len_instance_ids == 1 else 'instances'} found in region {region}"
         )
-
-        found_instance = False
-        for instance in instances:
-            try:
-                if instance.image_id in ami_ids:
-                    found_instance = True
-                    if region not in instance_ids_by_region:
-                        instance_ids_by_region[region] = [instance.id]
-                    else:
-                        instance_ids_by_region[region].append(instance.id)
-                    with print_lock:
-                        info(
-                            f"matching instance in region {region} with ID: {instance.id}"
-                        )
-            except Exception as e:
-                with print_lock:
-                    error(f"{instance.id}: {e}")
-                continue
-
-        if not found_instance:
-            with print_lock:
-                info(f"no matching instances found in region {region}")
-        else:
-            with print_lock:
-                info(
-                    f"{len(instance_ids_by_region[region])} matching instances found in region {region}"
-                )
-
-    except Exception as e:
-        with print_lock:
-            warning(f"{region}: {e}")
 
 
 @perf_time
@@ -99,6 +93,7 @@ def find_instances_by_ami_owner(
         for region in regions
     ]
     find_instances(inputs, workers)
+    len_matched_regions = len(instance_ids_by_region.keys())
     info(
-        f"found {len(instance_ids_by_region)} regions with matching instances: {instance_ids_by_region}"
+        f"found {len_matched_regions} {'region' if len_matched_regions == 1 else 'regions'} with match: {instance_ids_by_region}"
     )

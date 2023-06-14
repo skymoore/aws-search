@@ -31,6 +31,12 @@ def cli(ctx, profile, workers, debug):
     ctx.obj["regions"] = get_all_regions(ctx.obj["session"])
 
 
+@cli.command("show-regions", help="Show all available regions")
+@pass_context
+def regions(ctx):
+    info(ctx.obj["regions"])
+
+
 # RDS COMMANDS
 
 
@@ -78,12 +84,6 @@ def ami_instances(ctx, owner_id, ami_name_filter):
         owner_id,
         ami_name_filter,
     )
-
-
-@cli.command("show-regions", help="Show all available regions")
-@pass_context
-def regions(ctx):
-    print(ctx.obj["regions"])
 
 
 # ECR COMMANDS
