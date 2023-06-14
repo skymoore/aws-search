@@ -1,6 +1,6 @@
 # Makefile
 
-.PHONY: sdist publish
+.PHONY: sdist publish install
 
 sdist:
 	@echo "Building source distribution..."
@@ -10,3 +10,7 @@ publish: sdist
 	@echo "Publishing to pypi..."
 	twine upload dist/*
 	rm -rf dist
+
+install:
+	@echo "Installing..."
+	python3 -m pip install .
