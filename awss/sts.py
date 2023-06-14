@@ -1,5 +1,5 @@
 from logging import info, warning
-from .lib import get_regions, perf_time, multithreaded
+from .lib import perf_time, multithreaded
 
 
 @multithreaded
@@ -17,8 +17,7 @@ def check_creds(session, region, print_lock, success, failure):
 
 
 @perf_time
-def check_credentials(session, workers, print_lock):
-    regions = get_regions(session, "sts")
+def check_credentials(session, workers, regions, print_lock):
     info(
         f"checking credentials in {len(regions)} aws regions with {workers} workers..."
     )

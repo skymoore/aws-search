@@ -3,9 +3,12 @@ from time import perf_counter
 import concurrent.futures
 
 
-def get_regions(session, service):
-    info("getting regions...")
-    return session.get_available_regions(service)
+def get_all_regions(session):
+    info("getting available regions...")
+    return [
+        region["RegionName"]
+        for region in session.client("ec2").describe_regions()["Regions"]
+    ]
 
 
 def multithreaded(func):

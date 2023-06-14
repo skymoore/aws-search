@@ -1,5 +1,5 @@
 from logging import info, warning
-from .lib import get_regions, perf_time, multithreaded
+from .lib import perf_time, multithreaded
 
 
 @multithreaded
@@ -34,8 +34,7 @@ def list_rds(session, region, print_lock):
 
 
 @perf_time
-def list_rds_instances(session, workers, print_lock):
-    regions = get_regions(session, "rds")
+def list_rds_instances(session, workers, regions, print_lock):
     info(
         f"searching {len(regions)} aws regions with {workers} workers for rds clusters or instances..."
     )

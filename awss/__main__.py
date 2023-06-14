@@ -5,6 +5,7 @@ from click import option, group, pass_context  # , Choice
 from .rds import list_rds_instances
 from .ec2 import find_instances_by_ami_owner
 from .sts import check_credentials
+from .lib import get_all_regions
 
 print_lock = Lock()
 
@@ -27,6 +28,7 @@ def cli(ctx, profile, workers, debug):
 
     id_arn = ctx.obj["session"].client("sts").get_caller_identity()["Arn"]
     info(f"using profile {ctx.obj['session'].profile_name} ({id_arn})")
+    ctx.obj["regions"] = get_all_regions(ctx.obj["session"])
 
 
 # RDS COMMANDS
@@ -41,7 +43,9 @@ def rds(ctx):
 @rds.command("list", help="List all RDS instance and cluster names")
 @pass_context
 def list_instances(ctx):
-    list_rds_instances(ctx.obj["session"], ctx.obj["workers"], print_lock)
+    list_rds_instances(
+        ctx.obj["session"], ctx.obj["workers"], ctx.obj["regions"], print_lock
+    )
 
 
 # EC2 COMMANDS
@@ -67,8 +71,19 @@ def ec2(ctx):
 )
 def ami_instances(ctx, owner_id, ami_name_filter):
     find_instances_by_ami_owner(
-        ctx.obj["session"], ctx.obj["workers"], print_lock, owner_id, ami_name_filter
+        ctx.obj["session"],
+        ctx.obj["workers"],
+        ctx.obj["regions"],
+        print_lock,
+        owner_id,
+        ami_name_filter,
     )
+
+
+@cli.command("show-regions", help="Show all available regions")
+@pass_context
+def regions(ctx):
+    print(ctx.obj["regions"])
 
 
 # ECR COMMANDS
@@ -92,4 +107,10 @@ def sts(ctx):
 @sts.command("check", help="Check if the current session is valid in all regions")
 @pass_context
 def check(ctx):
-    check_credentials(ctx.obj["session"], ctx.obj["workers"], print_lock)
+    check_credentials(
+        ctx.obj["session"], ctx.obj["workers"], ctx.obj["regions"], print_lock
+    )
+
+
+if __name__ == "__main__":
+    cli()

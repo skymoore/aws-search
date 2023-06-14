@@ -1,6 +1,6 @@
 from time import perf_counter
 from logging import info, error, warning
-from .lib import get_regions, perf_time, multithreaded
+from .lib import perf_time, multithreaded
 
 
 def get_ami_ids_by_owner(session, region, owner_id, name_filter, print_lock):
@@ -87,8 +87,9 @@ def find_instances(
 
 
 @perf_time
-def find_instances_by_ami_owner(session, workers, print_lock, owner_id, name_filter):
-    regions = get_regions(session, "ec2")
+def find_instances_by_ami_owner(
+    session, workers, regions, print_lock, owner_id, name_filter
+):
     info(
         f"searching {len(regions)} aws regions with {workers} workers for ec2 instances running an ami owned by {owner_id} whose name matches {name_filter}..."
     )
