@@ -19,7 +19,7 @@ def check_creds(session, region, print_lock, success, failure):
 @perf_time
 def check_credentials(session, workers, regions, print_lock):
     info(
-        f"checking credentials in {len(regions)} aws regions with {workers} workers..."
+        f"checking credentials in {len(regions)} aws regions with {workers} {'worker' if workers == 1 else 'workers'}..."
     )
     success = []
     failure = []
@@ -27,5 +27,11 @@ def check_credentials(session, workers, regions, print_lock):
 
     check_creds(inputs, workers)
 
-    info(f"credentials ok in {len(success)} regions: {success}")
-    info(f"credentials failure in {len(failure)} regions: {failure}")
+    len_success = len(success)
+    len_failure = len(failure)
+    info(
+        f"credentials ok in {len_success} {'region' if len_success == 1 else 'regions'}: {success}"
+    )
+    info(
+        f"credentials failure in {len_failure} {'region' if len_failure == 1 else 'regions'}: {failure}"
+    )
