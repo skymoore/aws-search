@@ -1,0 +1,89 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "ec2-ami-instances-ubuntu",
+      "type": "python",
+      "request": "launch",
+      "module": "awss",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "-w",
+        "17",
+        "ec2",
+        "ami-instances",
+        "-o",
+        "099720109477",
+        "-n",
+        "*18.04*"
+        //"--dry-run"
+      ],
+      // "envFile": "${workspaceFolder}/.env",
+      //"justMyCode": true
+    },
+    {
+      "name": "ec2-ami-instances-eks",
+      "type": "python",
+      "request": "launch",
+      "module": "awss",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "-w",
+        "17",
+        "ec2",
+        "ami-instances",
+        "-o",
+        "602401143452",
+        "-n",
+        "amazon-eks-node-1.24-v20230304"
+        //"--dry-run"
+      ],
+      // "envFile": "${workspaceFolder}/.env",
+      //"justMyCode": true
+    },
+    {
+      "name": "show-regions",
+      "type": "python",
+      "request": "launch",
+      "module": "awss",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "show-regions"
+      ],
+      // "envFile": "${workspaceFolder}/.env",
+      //"justMyCode": true
+    },
+    {
+      "name": "rds-list",
+      "type": "python",
+      "request": "launch",
+      "module": "awss",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "-w",
+        "10",
+        "rds",
+        "list"
+      ],
+      // "envFile": "${workspaceFolder}/.env",
+      //"justMyCode": true
+    },
+    {
+      "name": "acm-list",
+      "type": "python",
+      "request": "launch",
+      "module": "awss",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "-w",
+        "10",
+        "acm",
+        "list",
+        "-f",
+        "cloud"
+      ],
+      // "envFile": "${workspaceFolder}/.env",
+      //"justMyCode": true
+    }
+  ]
+}
