@@ -5,6 +5,7 @@ from click import option, group, pass_context  # , Choice
 from .rds import list_rds_instances
 from .ec2 import find_instances_by_ami_owner
 from .sts import check_credentials
+from .acm import list_all_acm
 from .lib import get_all_regions
 
 print_lock = Lock()
@@ -25,7 +26,6 @@ def cli(ctx, profile, workers, debug):
         level=DEBUG if debug else INFO,
         datefmt="%Y-%m-%d %H:%M:%S",
     )
-
     id_arn = ctx.obj["session"].client("sts").get_caller_identity()["Arn"]
     info(f"using profile {ctx.obj['session'].profile_name} ({id_arn})")
     ctx.obj["regions"] = get_all_regions(ctx.obj["session"])
@@ -51,6 +51,28 @@ def rds(ctx):
 def list_instances(ctx):
     list_rds_instances(
         ctx.obj["session"], ctx.obj["workers"], ctx.obj["regions"], print_lock
+    )
+
+
+# Certificate Manager COMMANDS
+
+
+@cli.group(help="Certificate Manager commands")
+@pass_context
+def acm(ctx):
+    pass
+
+
+@acm.command("list", help="List all ACM certificates and their names")
+@option(
+    "--filter",
+    "-f",
+    help="Filter certificates by name regex, enclose argument in single quotes",
+)
+@pass_context
+def list_certificates(ctx, filter):
+    list_all_acm(
+        ctx.obj["session"], ctx.obj["workers"], ctx.obj["regions"], filter, print_lock
     )
 
 
