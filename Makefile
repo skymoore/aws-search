@@ -1,16 +1,23 @@
-# Makefile
+default: build
 
-.PHONY: sdist publish install
+lock:
+	poetry lock
 
-sdist:
-	@echo "Building source distribution..."
-	python3 setup.py sdist
-
-publish: sdist
-	@echo "Publishing to pypi..."
-	twine upload dist/*
+.PHONY: clean
+clean:
 	rm -rf dist
 
-install:
-	@echo "Installing..."
-	python3 -m pip install .
+.PHONY: patch
+patch:
+	poetry version patch
+
+.PHONY: minor
+minor:
+	poetry version minor
+
+.PHONY: major
+major:
+	poetry version major
+
+build: clean
+	poetry build

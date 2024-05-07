@@ -12,13 +12,18 @@ print_lock = Lock()
 
 
 @group()
-@option("--profile", "-p", default="dev-adm", help="AWS profile to use")
+@option("--profile", "-p", help="AWS profile to use")
 @option("--workers", "-w", type=int, default=4, help="Number of workers")
 @option("--debug", "-d", is_flag=True, help="Enable debug logging")
 @pass_context
 def cli(ctx, profile, workers, debug):
     ctx.obj = {}
-    ctx.obj["session"] = boto3.Session(profile_name=profile)
+
+    if profile:
+        ctx.obj["session"] = boto3.Session(profile_name=profile)
+    else:
+        ctx.obj["session"] = boto3.Session()
+
     ctx.obj["workers"] = workers
 
     basicConfig(

@@ -1,4 +1,4 @@
-from logging import info, warning
+from logging import info
 from .lib import perf_time, multithreaded
 from pprint import PrettyPrinter
 

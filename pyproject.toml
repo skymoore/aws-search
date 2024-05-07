@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "aws-multi-region-search"
+version = "0.1.0"
+description = "AWS Multi Region Concurrent Query Tool"
+authors = ["Sky Moore <i@msky.me>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/skymoore/aws-search"
+keywords = ["aws", "cloud", "multi-region", "search", "concurrent"]
+classifiers = ["Intended Audience :: Developers", "Natural Language :: English", "Programming Language :: Python :: 3.10",]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+boto3 = "^1.34.99"
+click = "^8.1.7"
+
+[[tool.poetry.packages]]
+include = "awss"
+
+[tool.poetry.scripts]
+awss = "awss.__main__:cli"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

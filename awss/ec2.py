@@ -1,5 +1,4 @@
-from time import perf_counter
-from logging import info, error, warning
+from logging import info
 from .lib import perf_time, multithreaded
 
 
